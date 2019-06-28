@@ -4,9 +4,12 @@ include('DB.class.php');
 include('LIB_project1.php');
 function makeForm(){
 $db = new DB();
-// key that password needs to match to submit form 
+// key that password needs to match to submit form
 $key = 12345;
-$error = '';
+
+global $password;
+global $error;
+
 
 
 $id = $_GET['ProductID'];
@@ -18,11 +21,10 @@ $Description = $data['Description'];
 $Price = $data['Price'];
 $Quantity = $data['Quantity'];
 $SalePrice = $data['SalePrice'];
-// get password posted from form
-$password = $_POST['Password'];
 
-// add a connection to the database 
-$con = mysqli_connect('localhost','axh7593','a031895','axh7593');
+
+// add a connection to the database
+$con = mysqli_connect('localhost','root','root','php_shoeStore');
 // make form data
 $string = "";
 $string .="<form action='edit.php?ProductID=$ProductID' method='post'><input type='hidden' name='ProductID' value='$ProductID'/><div><p><strong>Product ID:</strong>$ProductID</p>
@@ -31,9 +33,17 @@ $string .="<form action='edit.php?ProductID=$ProductID' method='post'><input typ
 <strong>Description: *</strong> <input type='text' name='Description' value='$Description'/><br/>
 <strong>Price: *</strong> <input type='number' name='Price' value='$Price'/><br/>";
 
-$string .="<strong>Quantity: *</strong> <input type='number' name='Quantity' value='$Quantity'/><br/><strong>Sale Price: *</strong> <input type='number' name='SalePrice' value='$SalePrice'/><br/><p>* Required</p><input type='submit' name='submit' value='Submit'></div></form>";
-// display form 
+$string .="<strong>Quantity: *</strong> <input type='number' name='Quantity' value='$Quantity'/><br/><strong>Sale Price: *</strong> <input type='number' name='SalePrice' value='$SalePrice'/><br/><p>* Required</p><input type='submit' name='submit' value='Submit'><a href='admin.php'>Cancel</a></div></form>";
+// display form
 echo $string;
+
+// check to see if password is set
+if(isset($_POST[$password])){
+
+  // get password posted from form
+  $password = $_POST['Password'];
+
+}
 
 // if password is equal to the key submit query and update table, if not echo error
 if($password == $key)
@@ -41,21 +51,21 @@ if($password == $key)
 if(isset($_POST['submit'])){
       if(is_numeric($_POST['ProductID'])){
         $ProductID = $_POST['ProductID'];
-        // post corresponding table colums 
+        // post corresponding table colums
         $ProductName = mysqli_real_escape_string($con, htmlspecialchars($_POST['ProductName']));
         $Description = mysqli_real_escape_string($con, htmlspecialchars($_POST['Description']));
         $Price = mysqli_real_escape_string($con, htmlspecialchars($_POST['Price']));
         $Quantity = mysqli_real_escape_string($con, htmlspecialchars($_POST['Quantity']));
         $SalePrice = mysqli_real_escape_string($con, htmlspecialchars($_POST['SalePrice']));
      if ($valid == false){
-            $result = mysqli_query($con, "UPDATE Project1 SET ProductName='$ProductName', Description='$Description', Price='$Price', Quantity='$Quantity', SalePrice='$SalePrice' WHERE ProductID='$ProductID'") or die(mysqli_error);
+            $result = mysqli_query($con, "UPDATE shoes SET ProductName='$ProductName', Description='$Description', Price='$Price', Quantity='$Quantity', SalePrice='$SalePrice' WHERE ProductID='$ProductID'") or die(mysqli_error);
          echo $password;
             header("Location:admin.php");
 
         } else{
             $error = "An error occured";
             echo $error;
-        
+
         }
 } else {
           echo "not a number";
@@ -66,14 +76,14 @@ if(isset($_POST['submit'])){
     echo '<div style="padding:4px; border:1px solid red; color:red;">'.$error.'</div>';
 }
 
-    
+
 function validate($ProductName, $Description, $Price, $Quantity, $SalePrice){
     $error = false;
     if ($ProductName == ""){
         $error = true;
     }
     else {
-        
+
     }
       if ($Description == ""){
         $error = true;
@@ -92,7 +102,7 @@ function validate($ProductName, $Description, $Price, $Quantity, $SalePrice){
 }
 
 
-    
+
 ?>
 
 <!DOCTYPE HTML>
@@ -112,15 +122,9 @@ function validate($ProductName, $Description, $Price, $Quantity, $SalePrice){
         echo '<div style="padding:4px; border:1px solid red; color:red;">'.$error.'</div>';
 
     }
-?>    
+?>
 
 
 </body>
 
 </html>
-
-    
-
-
-    
-    

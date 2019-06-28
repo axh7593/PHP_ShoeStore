@@ -1,24 +1,26 @@
-    <!-- included files for header stuff -->
+   <!-- included files for header stuff -->
     <?php include('index_header.php'); ?>
 
     <?php include('carousel.php'); ?>
 
-           
-<!--------------------------CONTENT GOES HERE --------------------------------->  
-<?php 
+
+<!--------------------------CONTENT GOES HERE --------------------------------->
+<?php
     // establish a connection to database
-    $con = mysqli_connect('localhost','axh7593','a031895','axh7593');
-   
+    $con = mysqli_connect('localhost','root','root','php_shoeStore');
+
  $string4 = $db -> getSaleItemsFormatted();
     echo $string4;
 $per_page = 5;
-    
+
+$total_pages = "";
+
   // $result = mysqli_query($con, "SELECT * FROM Project1");
     //$result = $db -> getAllItems();
-$result = $db -> selectAllItems(); 
+$result = $db -> selectAllItems();
     $total = count($result);
     //echo $total;
- 
+
     // How many pages will there be
     $pages = ceil($total / $per_page);
 
@@ -36,35 +38,36 @@ $result = $db -> selectAllItems();
     $data  = $db -> populatePage($per_page, $offset);
         //s$data = $ -> getAllItems();
         if(count($data) > 0){
-            $bigString = "<div class='row'> 
+            $bigString = "<div class='row'>
                         <div class='row'>
                         <h2> Catalog</h2>";
 
-            
+
             // parse all data into HTML
-            // display sale items as intended by the bootstrap template used 
+            // display sale items as intended by the bootstrap template used
             foreach($data as $row){
                 $bigString .= "<form action='index.php' method='POST'>
                         <div class='col-sm-4 col-lg-4 col-md-4'>
-                        <div class='thumbnail'> 
+                        <div class='thumbnail'>
                          <img src='img/{$row["ImageName"]}'>
                         <div class='caption'>
                         <input type='hidden' name='id' value='{$row['ProductID']}'>
                         <input type='submit' name='submit' id='{$row['ProductID']}'class='btn' value='Add To Cart'>";
-                
+
                 $bigString .= "<h4 class='pull-right'>Price:$"."{$row['Price']}</h4>
                                 <h4>{$row['ProductName']} </h4>
                                 <h4> Quantity Left: {$row['Quantity']} </h4>
                                 <p> {$row['Description']} </p>
                                 </div></form></div></div>";
             }
-            
+
             $bigString .= "</div></div>";
         } else {
             $bigString = "<h2> No Products exist </h2>";
         }
         echo $bigString;
-        
+
+
 
     $prevlink = ($page > 1) ? '<a class ="button" href="?page=1" title="First page">&laquo; First Page</a> <a class ="button" href="?page=' . ($page - 1) . '" title="Previous page">&lsaquo; Previous Page</a>' : '<span class="disabled">&laquo;</span> <span class="disabled">&lsaquo;</span>';
 
@@ -77,10 +80,10 @@ $result = $db -> selectAllItems();
     ////////////////////////////paging ///////////////////////////
     if(isset($_GET['page']) && is_numeric($_GET['page'])){
         $show_page = $_GET['page'];
-        
+
         if($show_page > 0 && $show_page <= $total_pages){
             $start = ($show_page - 1) * $per_page;
-            $end = $start + $per_page; 
+            $end = $start + $per_page;
         } else{
             $start = 0;
             $end = $per_page;
@@ -101,25 +104,25 @@ $result = $db -> selectAllItems();
     echo "</p>";
 
 
-    //on 'submit' button put non sale items selected into cart  
+    //on 'submit' button put non sale items selected into cart
     if(isset($_REQUEST['submit'])){
         echo $thing = $_POST['id'];
-        
-        
+
+
         $check = $db -> ifExists($thing);
 
-     
+
         //var_dump($check);
         if(count($check) > 0){
-            
+
             $checkedQuan = $check[0]["Quantity"];
-            
-        
+
+
             $checkedQuan = $checkedQuan + 1;
 
             $success = $db -> updateQuantity($thing,$checkedQuan);
 
-          
+
             echo "added updated Product";
         } else{
            $string2 = $db -> addToCart();
@@ -127,24 +130,24 @@ $result = $db -> selectAllItems();
             echo "Added new item to cart";
         }
 
-          
+
     }
     // on 'saleSubmit' button put sale items selected into cart
-    if(isset($_REQUEST['saleSubmit'])){       
+    if(isset($_REQUEST['saleSubmit'])){
          echo $thing = $_POST['id'];
-        
-        
+
+
         $check = $db -> ifExists($thing);
         echo "COUNT";
-  
+
         //var_dump($check);
         if(count($check) > 0){
-            
+
             $checkedQuan = $check[0]["Quantity"];
-            
+
             echo "check: $checkedQuan";
             $checkedQuan = $checkedQuan + 1;
-       
+
             $success = $db -> updateQuantity($thing,$checkedQuan);
 
             echo "added updated Product";
@@ -153,12 +156,12 @@ $result = $db -> selectAllItems();
             echo $string2;
             echo "Added new item to cart";
         }
-        
+
     }
 
-    
+
     echo "<a href='index.php?"
-?>        
+?>
             </div>
 
         </div>
@@ -171,7 +174,7 @@ $result = $db -> selectAllItems();
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
-    
+
 
     <!-- AJAX used to refresh page so Quantity is shown as updated -->
     <script type="text/javascript">
